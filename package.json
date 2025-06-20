@@ -1,0 +1,137 @@
+{
+    "name": "logfire",
+    "displayName": "Logfire",
+    "description": "A Visual Studio Code extension for Logfire.",
+    "version": "2025.1.0",
+    "preview": true,
+    "serverInfo": {
+        "name": "Logfire",
+        "module": "logfire"
+    },
+    "publisher": "Pydantic",
+    "license": "MIT",
+    "homepage": "https://github.com/pydantic/logfire-vscode",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/pydantic/logfire-vscode.git"
+    },
+    "bugs": {
+        "url": "https://github.com/pydantic/logfire-vscode/issues"
+    },
+    "galleryBanner": {
+        "color": "#1d0214",
+        "theme": "dark"
+    },
+    "keywords": [
+        "python",
+        "logfire"
+    ],
+    "engines": {
+        "vscode": "^1.78.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "extensionDependencies": [
+        "ms-python.python"
+    ],
+    "capabilities": {
+        "virtualWorkspaces": {
+            "supported": false,
+            "description": "Virtual Workspaces are not supported with Logfire."
+        }
+    },
+    "activationEvents": [
+        "onLanguage:python",
+        "workspaceContains:*.py"
+    ],
+    "main": "./dist/extension.js",
+    "scripts": {
+        "vscode:prepublish": "npm run package",
+        "compile": "webpack",
+        "watch": "webpack --watch",
+        "package": "webpack --mode production --devtool source-map --config ./webpack.config.js",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "npm run compile-tests && npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "format": "prettier --write 'src/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
+        "format-check": "prettier --check 'src/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
+        "test": "node ./out/test/runTest.js",
+        "vsce-package": "vsce package -o logfire.vsix"
+    },
+    "contributes": {
+        "configuration": {
+            "properties": {
+                "logfire.environment": {
+                    "default": null,
+                    "markdownDescription": "The [environment](https://logfire.pydantic.dev/docs/how-to-guides/environments/) to use when querying spans/logs. If set to `null` (the default), *all envs* will be queried. If set to an empty string (`\"\"`), only the spans *without* an env will be queried.",
+                    "scope": "resource",
+                    "type": ["string", "null"]
+                },
+                "logfire.interpreter": {
+                    "default": [],
+                    "description": "When set to a path to python executable, extension will use that to launch the server and any subprocess.",
+                    "scope": "resource",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "logfire.showNotifications": {
+                    "default": "off",
+                    "description": "Controls when notifications are shown by this extension.",
+                    "enum": [
+                        "off",
+                        "onError",
+                        "onWarning",
+                        "always"
+                    ],
+                    "enumDescriptions": [
+                        "All notifications are turned off, any errors or warning are still available in the logs.",
+                        "Notifications are shown only in the case of an error.",
+                        "Notifications are shown for errors and warnings.",
+                        "Notifications are show for anything that the server chooses to show."
+                    ],
+                    "scope": "machine",
+                    "type": "string"
+                }
+            }
+        },
+        "commands": [
+            {
+                "title": "Restart Server",
+                "category": "Logfire",
+                "command": "logfire.restart"
+            }
+        ]
+    },
+    "prettier": {
+        "printWidth": 120,
+        "tabWidth": 2,
+        "singleQuote": true,
+        "trailingComma": "all"
+    },
+    "dependencies": {
+        "@vscode/python-extension": "^1.0.5",
+        "fs-extra": "^11.2.0",
+        "vscode-languageclient": "^8.1.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^11.0.4",
+        "@types/vscode": "1.78.0",
+        "@types/glob": "^8.1.0",
+        "@types/node": "20.x",
+        "@typescript-eslint/eslint-plugin": "^6.17.0",
+        "@typescript-eslint/parser": "^6.17.0",
+        "@vscode/test-electron": "^2.3.8",
+        "@vscode/vsce": "^2.22.0",
+        "eslint": "^8.56.0",
+        "glob": "^10.3.10",
+        "prettier": "^3.1.1",
+        "typescript": "^5.3.3",
+        "ts-loader": "^9.5.1",
+        "webpack": "^5.89.0",
+        "webpack-cli": "^5.1.4"
+    }
+}
