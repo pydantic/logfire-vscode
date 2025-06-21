@@ -3,16 +3,13 @@ name = "logfire-vscode"
 version = "2025.1.0"
 description = "A Visual Studio Code extension for Pydantic Logfire"
 requires-python = ">=3.9"
-dependencies = ["logfire-lsp==0.0.1"]
+dependencies = ["logfire-lsp==0.0.2"]
 
 
 [tool.uv]
 required-version = ">=0.7.2"
 # Allow prereleases for pygls2.0.0alpha pinning lsprotocol==2025.0.0rc1:
 prerelease = "allow"
-
-[tool.uv.sources]
-logfire-lsp = { path = "../logfire-lsp" }
 
 [tool.ruff]
 line-length = 120

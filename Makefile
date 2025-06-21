@@ -1,6 +1,6 @@
 .PHONY: setup  ## Setup the environment
 setup:
-	uv pip sync --require-hashes ./requirements.txt --target ./bundled/libs
+	uv pip sync --require-hashes ./requirements.txt --target ./bundled/libs --python 3.12
 
 .PHONY: lock  ## Lock the project dependencies
 lock:

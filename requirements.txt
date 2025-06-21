@@ -80,7 +80,9 @@ libcst==1.8.2 \
     --hash=sha256:f74b0bc7378ad5afcf25ac9d0367b4dbba50f6f6468faa41f5dfddcf8bf9c0f8 \
     --hash=sha256:fa3b807c2d2b34397c135d19ad6abb20c47a2ddb7bf65d90455f2040f7797e1e
     # via logfire-lsp
-../logfire-lsp
+logfire-lsp==0.0.2 \
+    --hash=sha256:7168363c6626852d1344153cf7018d466688907eb295f62272c381da80ab0b08 \
+    --hash=sha256:c1a013698d09f8f5277839f7f172bde2fb83cb7f4fbcc419d39ea150ab25f997
     # via logfire-vscode (./pyproject.toml)
 lsprotocol==2025.0.0rc1 \
     --hash=sha256:22ee3dc898f0d15b7befeb923073e46e1cd2661c01365f7f7da113d1f168c555 \
