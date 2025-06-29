@@ -58,8 +58,7 @@
         "lint": "eslint src --ext ts",
         "format": "prettier --write 'src/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
         "format-check": "prettier --check 'src/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
-        "test": "node ./out/test/runTest.js",
-        "vsce-package": "vsce package -o logfire.vsix"
+        "test": "node ./out/test/runTest.js"
     },
     "contributes": {
         "configuration": {
@@ -68,7 +67,10 @@
                     "default": null,
                     "markdownDescription": "The [environment](https://logfire.pydantic.dev/docs/how-to-guides/environments/) to use when querying spans/logs. If set to `null` (the default), *all envs* will be queried. If set to an empty string (`\"\"`), only the spans *without* an env will be queried.",
                     "scope": "resource",
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "logfire.interpreter": {
                     "default": [],
@@ -120,18 +122,19 @@
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.4",
-        "@types/vscode": "1.78.0",
         "@types/glob": "^8.1.0",
         "@types/node": "20.x",
+        "@types/vscode": "1.78.0",
         "@typescript-eslint/eslint-plugin": "^6.17.0",
         "@typescript-eslint/parser": "^6.17.0",
         "@vscode/test-electron": "^2.3.8",
         "@vscode/vsce": "^2.22.0",
         "eslint": "^8.56.0",
         "glob": "^10.3.10",
+        "ovsx": "^0.10.4",
         "prettier": "^3.1.1",
-        "typescript": "^5.3.3",
         "ts-loader": "^9.5.1",
+        "typescript": "^5.3.3",
         "webpack": "^5.89.0",
         "webpack-cli": "^5.1.4"
     }

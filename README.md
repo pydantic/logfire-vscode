@@ -6,15 +6,11 @@ A Visual Studio Code extension for the [Logfire platform](https://logfire.pydant
 >
 > This project is in early development.
 
-<div align="center">
-    <picture>
-      <img src="./assets/example.png" alt="LSP Example">
-    </picture>
-</div>
+![LSP Example](./assets/example.png)
 
 ## Installation
 
-The extensions is available on the [Visual Studio Marketplace](TODO).
+The extension is available on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Pydantic.logfire).
 
-The extension requires [project credentials](https://logfire.pydantic.dev/docs/#about-logfire) to be set up
-(in the `.logfire/` directory at the root of your project).
+**To make use of the extension**, [project credentials](https://logfire.pydantic.dev/docs/#about-logfire)
+should be set up first (in the `.logfire/` directory at the root of your project).

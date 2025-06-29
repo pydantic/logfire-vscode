@@ -1,0 +1,236 @@
+{
+    "win32-x64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/bc/c6/fa92699b537ed65e93c2869144e23bdf156ec81ae7b84b4f34cbc20d6048/libcst-1.8.2-cp310-cp310-win_amd64.whl",
+            "sha256": "5c513e64eff0f7bf2a908e2d987a98653eb33e1062ce2afd3a84af58159a24f9"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/f8/fc/28f6380eefd58543f80589b77cab81eb038e7cc86f7c34a815a287dba82f/libcst-1.8.2-cp311-cp311-win_amd64.whl",
+            "sha256": "96e2363e1f6e44bd7256bbbf3a53140743f821b5133046e6185491e0d9183447"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/bb/df/7a49576c9fd55cdfd8bcfb725273aa4ee7dc41e87609f3451a4901d68057/libcst-1.8.2-cp312-cp312-win_amd64.whl",
+            "sha256": "3ece08ba778b6eeea74d9c705e9af2d1b4e915e9bc6de67ad173b962e575fcc0"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/e6/84/fb88f2ffdb045ff7323a6c05dd3d243a9eb3cb3517a6269dee43fbfb9990/libcst-1.8.2-cp313-cp313t-win_amd64.whl",
+            "sha256": "51bbafdd847529e8a16d1965814ed17831af61452ee31943c414cb23451de926"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/96/3d/ba5e36c663028043fc607dc33e5c390c7f73136fb15a890fb3710ee9d158/libcst-1.8.2-cp313-cp313-win_amd64.whl",
+            "sha256": "b62aa11d6b74ed5545e58ac613d3f63095e5fd0254b3e0d1168fda991b9a6b41"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/b7/83/b4d659782e88f46c073ea5cbd9a4e99bf7ea17883632371795f91121b220/libcst-1.8.2-cp39-cp39-win_amd64.whl",
+            "sha256": "59e8f611c977206eba294c296c2d29a1c1b1b88206cb97cd0d4847c1a3d923e7"
+        }
+    ],
+    "win32-arm64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/b0/ac/4ec4ae9da311f72cd97e930c325bb605e9ad0baaafcafadb0588e1dc5c4e/libcst-1.8.2-cp310-cp310-win_arm64.whl",
+            "sha256": "41613fe08e647213546c7c59a5a1fc5484666e7d4cab6e80260c612acbb20e8c"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/ef/db/cdbd1531bca276c44bc485e40c3156e770e01020f8c1a737282bf884d69f/libcst-1.8.2-cp311-cp311-win_arm64.whl",
+            "sha256": "f5391d71bd7e9e6c73dcb3ee8d8c63b09efc14ce6e4dad31568d4838afc9aae0"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/29/60/27381e194d2af08bfd0fed090c905b2732907b69da48d97d86c056d70790/libcst-1.8.2-cp312-cp312-win_arm64.whl",
+            "sha256": "5efd1bf6ee5840d1b0b82ec8e0b9c64f182fa5a7c8aad680fbd918c4fa3826e0"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/d3/8f/da755d6d517eb8ec9664afae967b00a9b8dd567bbbb350e261359c1b47fc/libcst-1.8.2-cp313-cp313t-win_arm64.whl",
+            "sha256": "4f14f5045766646ed9e8826b959c6d07194788babed1e0ba08c94ea4f39517e3"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/a5/34/530ca3b972dddad562f266c81190bea29376f8ba70054ea7b45b114504cd/libcst-1.8.2-cp313-cp313-win_arm64.whl",
+            "sha256": "9c2bd4ac288a9cdb7ffc3229a9ce8027a66a3fd3f2ab9e13da60f5fbfe91f3b2"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/01/4a/3614b732cb25a3bba93ffde84b9e006007c687a9c84d22e64add56dee5fd/libcst-1.8.2-cp39-cp39-win_arm64.whl",
+            "sha256": "ae22376633cfa3db21c4eed2870d1c36b5419289975a41a45f34a085b2d9e6ea"
+        }
+    ],
+    "linux-x64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/b3/75/826b5772192826d70480efe93bab3e4f0b4a24d31031f45547257ad5f9a8/libcst-1.8.2-cp310-cp310-manylinux_2_28_x86_64.whl",
+            "sha256": "d20e932ddd9a389da57b060c26e84a24118c96ff6fc5dcc7b784da24e823b694"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/05/16/51c1015dada47b8464c5fa0cbf70fecc5fce0facd07d05a5cb6e7eb68b88/libcst-1.8.2-cp311-cp311-manylinux_2_28_x86_64.whl",
+            "sha256": "b0110140738be1287e3724080a101e7cec6ae708008b7650c9d8a1c1788ec03a"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/7d/7d/eb341bdc11f1147e7edeccffd0f2f785eff014e72134f5e46067472012b0/libcst-1.8.2-cp312-cp312-manylinux_2_28_x86_64.whl",
+            "sha256": "460fcf3562f078781e1504983cb11909eb27a1d46eaa99e65c4b0fafdc298298"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/64/f4/107e13815f1ee5aad642d4eb4671c0273ee737f3832e3dbca9603b39f8d9/libcst-1.8.2-cp313-cp313-manylinux_2_28_x86_64.whl",
+            "sha256": "b68ea4a6018abfea1f68d50f74de7d399172684c264eb09809023e2c8696fc23"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/fa/49/12a5664c73107187ba3af14869d3878fca1fd4c37f6fbb9adb943cb7a791/libcst-1.8.2-cp313-cp313t-manylinux_2_28_x86_64.whl",
+            "sha256": "6753e50904e05c27915933da41518ecd7a8ca4dd3602112ba44920c6e353a455"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/08/6f/5ef938f947e7cdd83bdffb6929697e7f27b0ae4a6f84a7f30e044690ba1c/libcst-1.8.2-cp39-cp39-manylinux_2_28_x86_64.whl",
+            "sha256": "36d5ab95f39f855521585b0e819dc2d4d1b2a4080bad04c2f3de1e387a5d2233"
+        }
+    ],
+    "linux-arm64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/49/fa/9ca145aa9033f9a8362a5663ceb28dfb67082574de8118424b6b8e445e7a/libcst-1.8.2-cp310-cp310-manylinux_2_28_aarch64.whl",
+            "sha256": "22c9473a2cc53faabcc95a0ac6ca4e52d127017bf34ba9bc0f8e472e44f7b38e"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/b5/c2/af8d6cc0c6dcd1a5d0ed5cf846be242354513139a9358e005c63252c6ab7/libcst-1.8.2-cp311-cp311-manylinux_2_28_aarch64.whl",
+            "sha256": "d11992561de0ad29ec2800230fbdcbef9efaa02805d5c633a73ab3cf2ba51bf1"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/85/e4/0dd752c1880b570118fa91ac127589e6cf577ddcb2eef1aaf8b81ecc3f79/libcst-1.8.2-cp312-cp312-manylinux_2_28_aarch64.whl",
+            "sha256": "b88e9104c456590ad0ef0e82851d4fc03e9aa9d621fa8fdd4cd0907152a825ae"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/38/83/819d2b1b1fd870ad34ce4f34ec68704ca69bf48ef2d7665483115f267ec4/libcst-1.8.2-cp313-cp313-manylinux_2_28_aarch64.whl",
+            "sha256": "be821d874ce8b26cbadd7277fa251a9b37f6d2326f8b5682b6fc8966b50a3a59"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/ac/c5/31d214a0bcb3523243a9b5643b597ff653d6ec9e1f3326cfcc16bcbf185d/libcst-1.8.2-cp313-cp313t-manylinux_2_28_aarch64.whl",
+            "sha256": "d2194ae959630aae4176a4b75bd320b3274c20bef2a5ca6b8d6fc96d3c608edf"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/6a/33/dd10a5ad783f3c1edc55fe97f5cbfe3924f6a7ce3556464538640a348e04/libcst-1.8.2-cp39-cp39-manylinux_2_28_aarch64.whl",
+            "sha256": "8a81d816c2088d2055112af5ecd82fdfbe8ff277600e94255e2639b07de10234"
+        }
+    ],
+    "linux-armhf": [
+        {
+            "url": "https://files.pythonhosted.org/packages/0c/25/496a025c09e96116437a57fd34abefe84c041d930f832c6e42d84d9e028c/libcst-1.8.2-cp310-cp310-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl",
+            "sha256": "b5269b96367e65793a7714608f6d906418eb056d59eaac9bba980486aabddbed"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/b6/b8/1638698d6c33bdb4397ee6f60e534e7504ef2cd1447b24104df65623dedb/libcst-1.8.2-cp311-cp311-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl",
+            "sha256": "fa3b807c2d2b34397c135d19ad6abb20c47a2ddb7bf65d90455f2040f7797e1e"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/42/bc/fceae243c6a329477ac6d4edb887bcaa2ae7a3686158d8d9b9abb3089c37/libcst-1.8.2-cp312-cp312-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl",
+            "sha256": "e5ba3ea570c8fb6fc44f71aa329edc7c668e2909311913123d0d7ab8c65fc357"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/d4/2f/2c4742bf834f88a9803095915c4f41cafefb7b04bde66ea86f74668b4b7b/libcst-1.8.2-cp313-cp313-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl",
+            "sha256": "f74b0bc7378ad5afcf25ac9d0367b4dbba50f6f6468faa41f5dfddcf8bf9c0f8"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/70/16/a53f852322b266c63b492836a5c4968f192ee70fb52795a79feb4924e9ed/libcst-1.8.2-cp313-cp313t-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl",
+            "sha256": "0be639f5b2e1999a4b4a82a0f4633969f97336f052d0c131627983589af52f56"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/dd/66/e7a208e5208bbd37b5be989e22b7abd117c40866b7880e7c447f4fb8ee46/libcst-1.8.2-cp39-cp39-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl",
+            "sha256": "449f9ff8a5025dcd5c8d4ad28f6c291de5de89e4c044b0bda96b45bef8999b75"
+        }
+    ],
+    "alpine-x64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/fc/52/74b69350db379b1646739288b88ffab2981b2ad48407faf03df3768d7d2f/libcst-1.8.2-cp310-cp310-musllinux_1_2_x86_64.whl",
+            "sha256": "7fe762c4c390039b79b818cbc725d8663586b25351dc18a2704b0e357d69b924"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/73/fd/0441cc1bcf188300aaa41ca5d473919a00939cc7f4934b3b08b23c8740c1/libcst-1.8.2-cp311-cp311-musllinux_1_2_x86_64.whl",
+            "sha256": "e9bb599c175dc34a4511f0e26d5b5374fbcc91ea338871701a519e95d52f3c28"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/83/37/a41788a72dc06ed3566606f7cf50349c9918cee846eeae45d1bac03d54c2/libcst-1.8.2-cp312-cp312-musllinux_1_2_x86_64.whl",
+            "sha256": "a70e40ce7600e1b32e293bb9157e9de3b69170e2318ccb219102f1abb826c94a"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/c8/d3/590cde9c8c386d5f4f05fdef3394c437ea51060478a5141ff4a1f289e747/libcst-1.8.2-cp313-cp313-musllinux_1_2_x86_64.whl",
+            "sha256": "a5d5519962ce7c72d81888fb0c09e58e308ba4c376e76bcd853b48151063d6a8"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/af/67/b625fd6ae22575255aade0a24f45e1d430b7e7279729c9c51d4faac982d2/libcst-1.8.2-cp313-cp313t-musllinux_1_2_x86_64.whl",
+            "sha256": "dd4310ea8ddc49cc8872e083737cf806299b17f93159a1f354d59aa08993e876"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/35/1d/f67e6cb1146c0b546f095baf0d6ff6fa561bd61c1e1a5357e9557a16d501/libcst-1.8.2-cp39-cp39-musllinux_1_2_x86_64.whl",
+            "sha256": "52a1067cf31d9e9e4be514b253bea6276f1531dd7de6ab0917df8ce5b468a820"
+        }
+    ],
+    "alpine-arm64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/93/f4/316fa14ea6c61ea8755672d60e012558f0216300b3819e72bebc7864a507/libcst-1.8.2-cp310-cp310-musllinux_1_2_aarch64.whl",
+            "sha256": "a553d452004e44b841788f6faa7231a02157527ddecc89dbbe5b689b74822226"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/d5/ea/8d24158f345ea2921d0d7ff49a6bf86fd4a08b0f05735f14a84ea9e28fa9/libcst-1.8.2-cp311-cp311-musllinux_1_2_aarch64.whl",
+            "sha256": "a50618f4819a97ef897e055ac7aaf1cad5df84c206f33be35b0759d671574197"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/d8/19/78bfc7aa5a542574d2ab0768210d084901dec5fc373103ca119905408cf2/libcst-1.8.2-cp312-cp312-musllinux_1_2_aarch64.whl",
+            "sha256": "c1381ddbd1066d543e05d580c15beacf671e1469a0b2adb6dba58fec311f4eed"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/03/63/2948b6e4be367ad375d273a8ad00df573029cffe5ac8f6c09398c250de5b/libcst-1.8.2-cp313-cp313-musllinux_1_2_aarch64.whl",
+            "sha256": "2e264307ec49b2c72480422abafe80457f90b4e6e693b7ddf8a23d24b5c24001"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/e9/46/2d62552a9346a040c045d6619b645d59bb707a586318121f099abd0cd5c4/libcst-1.8.2-cp313-cp313t-musllinux_1_2_aarch64.whl",
+            "sha256": "706d07106af91c343150be86caeae1ea3851b74aa0730fcbbf8cd089e817f818"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/04/5b/2f965ae65ef12bc0800a35c5668df3eda26437f6a8bcc0f5520b02f3c3a5/libcst-1.8.2-cp39-cp39-musllinux_1_2_aarch64.whl",
+            "sha256": "207575dec2dae722acf6ab39b4b361151c65f8f895fd37edf9d384f5541562e1"
+        }
+    ],
+    "darwin-x64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/3c/2e/1d7f67d2ef6f875e9e8798c024f7cb3af3fe861e417bff485c69b655ac96/libcst-1.8.2-cp310-cp310-macosx_10_12_x86_64.whl",
+            "sha256": "67d9720d91f507c87b3e5f070627ad640a00bc6cfdf5635f8c6ee9f2964cf71c"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/c5/73/f0a4d807bff6931e3d8c3180472cf43d63a121aa60be895425fba2ed4f3a/libcst-1.8.2-cp311-cp311-macosx_10_12_x86_64.whl",
+            "sha256": "688a03bac4dfb9afc5078ec01d53c21556381282bdf1a804dd0dbafb5056de2a"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/31/2d/8726bf8ea8252e8fd1e48980753eef5449622c5f6cf731102bc43dcdc2c6/libcst-1.8.2-cp312-cp312-macosx_10_13_x86_64.whl",
+            "sha256": "2e8c1dfa854e700fcf6cd79b2796aa37d55697a74646daf5ea47c7c764bac31c"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/11/9c/e3d4c7f1eb5c23907f905f84a4da271b60cd15b746ac794d42ea18bb105e/libcst-1.8.2-cp313-cp313-macosx_10_13_x86_64.whl",
+            "sha256": "08e9dca4ab6f8551794ce7ec146f86def6a82da41750cbed2c07551345fa10d3"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/19/9f/491f7b8d9d93444cd9bf711156ee1f122c38d25b903599e363d669acc8ab/libcst-1.8.2-cp313-cp313t-macosx_10_13_x86_64.whl",
+            "sha256": "08a8c7d9922ca6eed24e2c13a3c552b3c186af8fc78e5d4820b58487d780ec19"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/2e/55/7c223ffc44fa623cc4c6c45e932d8e0724e31c8daede8a66d6a53ccd49a1/libcst-1.8.2-cp39-cp39-macosx_10_12_x86_64.whl",
+            "sha256": "f69582e24667715e3860d80d663f1caeb2398110077e23cc0a1e0066a851f5ab"
+        }
+    ],
+    "darwin-arm64": [
+        {
+            "url": "https://files.pythonhosted.org/packages/82/d0/3d94fee2685f263fd8d85a83e2537fcc78b644eae450738bf2c72604f0df/libcst-1.8.2-cp310-cp310-macosx_11_0_arm64.whl",
+            "sha256": "94b7c032b72566077614a02baab1929739fd0af0cc1d46deaba4408b870faef2"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/e5/fa/ede0cfc410e498e1279eb489603f31077d2ca112d84e1327b04b508c0cbe/libcst-1.8.2-cp311-cp311-macosx_11_0_arm64.whl",
+            "sha256": "c34060ff2991707c710250463ae9f415ebb21653f2f5b013c61c9c376ff9b715"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/99/b3/565d24db8daed66eae7653c1fc1bc97793d49d5d3bcef530450ee8da882c/libcst-1.8.2-cp312-cp312-macosx_11_0_arm64.whl",
+            "sha256": "2b5c57a3c1976c365678eb0730bcb140d40510990cb77df9a91bb5c41d587ba6"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/59/e0/635cbb205d42fd296c01ab5cd1ba485b0aee92bffe061de587890c81f1bf/libcst-1.8.2-cp313-cp313-macosx_11_0_arm64.whl",
+            "sha256": "8310521f2ccb79b5c4345750d475b88afa37bad930ab5554735f85ad5e3add30"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/2e/fe/4d13437f453f92687246aa7c5138e102ee5186fe96609ee4c598bb9f9ecb/libcst-1.8.2-cp313-cp313t-macosx_11_0_arm64.whl",
+            "sha256": "bba7c2b5063e8ada5a5477f9fa0c01710645426b5a8628ec50d558542a0a292e"
+        },
+        {
+            "url": "https://files.pythonhosted.org/packages/77/3a/dced5455963238f1ebedd28cf48bfd5e5d84c847132846a2567f5beaf7fc/libcst-1.8.2-cp39-cp39-macosx_11_0_arm64.whl",
+            "sha256": "1ba85f9e6a7f37ef998168aa3fd28d263d7f83016bd306a4508a2394e5e793b4"
+        }
+    ]
+}

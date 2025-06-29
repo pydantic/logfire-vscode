@@ -2,19 +2,31 @@
 name = "logfire-vscode"
 version = "2025.1.0"
 description = "A Visual Studio Code extension for Pydantic Logfire"
+authors = [
+    {name = "Victorien Plot", email = "contact@vctrn.dev"},
+]
+readme = "README.md"
 requires-python = ">=3.9"
-dependencies = ["logfire-lsp==0.0.2"]
+dependencies = ["logfire-lsp==0.0.4"]
+
+[dependency-groups]
+dev = [
+    "requests>=2.32.4",
+    "requirements-parser>=0.13.0",
+    "wheel-filename>=1.4.2",
+]
 
 
 [tool.uv]
 required-version = ">=0.7.2"
+default-groups = ["dev"]
 # Allow prereleases for pygls2.0.0alpha pinning lsprotocol==2025.0.0rc1:
 prerelease = "allow"
 
 [tool.ruff]
 line-length = 120
 target-version = "py39"
-extend-exclude = ["bundled/libs"]
+include = ["scripts/*.py", "bundled/tool/*.py", "**/pyproject.toml"]
 
 [tool.ruff.format]
 quote-style = "single"
@@ -35,7 +47,6 @@ select = [
     "FA",     # flake8-future-annotations
     "PIE",    # flake8-pie
     "PYI",    # flake8-pyi
-    "T20",    # flake8-print
     "Q",      # flake8-quotes
     "RSE",    # flake8-raise
     "PTH",    # flake8-use-pathlib

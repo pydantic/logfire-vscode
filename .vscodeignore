@@ -13,6 +13,8 @@ vsc-extension-quickstart.md
 .venv/**
 .nox/**
 .github/
+libcst_versions.json
+scripts/**
 **/__pycache__/**
 **/*.pyc
 bundled/libs/bin/**

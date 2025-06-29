@@ -1,0 +1,97 @@
+name: Release
+on:
+  push:
+    tags:
+      - "**"
+
+jobs:
+
+  build:
+    strategy:
+      matrix:
+        code-target: [win32-x64, win32-arm64, linux-x64, linux-arm64, linux-armhf, alpine-x64, alpine-arm64, darwin-x64, darwin-arm64]
+
+    name: Build (${{ matrix.code-target }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies (${{ matrix.code-target }})
+        run: |
+          uv sync
+          npm ci
+
+      - name: Setup bundled dependencies
+        run: make setup code-target=${{ matrix.code-target }}
+
+      - name: Build extension (${{ matrix.code-target }})
+        run: make build code-target=${{ matrix.code-target }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.code-target }}
+          path: ./dist
+
+  publish-code-marketplace:
+    name: Publish to VSCode Marketplace
+    needs: ['build']
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: dist-*
+          path: dist
+
+      - run: ls -al ./dist
+
+      - run: npm ci
+
+      - name: Publish extension to VSCode Marketplace
+        run: npx vsce publish --packagePath ./dist/logfire-*.vsix --pat ${{ secrets.MARKETPLACE_TOKEN }}
+
+  publish-open-vsx:
+    # Disabled for now.
+    if: false
+    name: Publish to Open VSX
+    needs: ['build']
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: dist-*
+          path: dist
+
+      - run: ls -al ./dist
+
+      - run: npm ci
+
+      - name: Publish extension to Open VSX
+        run: npx ovsx publish --packagePath ./dist/logfire-*.vsix --pat ${{ secrets.OPENVSX_TOKEN }}
