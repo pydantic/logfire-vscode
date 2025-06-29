@@ -3,7 +3,7 @@
     "displayName": "Logfire",
     "description": "A Visual Studio Code extension for Logfire.",
     "icon": "assets/icon.png",
-    "version": "2025.1.0",
+    "version": "2025.2.0",
     "preview": true,
     "serverInfo": {
         "name": "Logfire",
