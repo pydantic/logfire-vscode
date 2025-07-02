@@ -6,7 +6,9 @@ A Visual Studio Code extension for the [Logfire platform](https://logfire.pydant
 >
 > This project is in early development.
 
-![LSP Example](./assets/example.png)
+![LSP Example](https://raw.githubusercontent.com/pydantic/logfire-vscode/refs/heads/main/assets/example.png)
+
+The extension provides CodeLens annotations on Logfire logging calls, redirecting to the Live View.
 
 ## Installation
 
