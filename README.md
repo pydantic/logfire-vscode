@@ -1,4 +1,4 @@
-# Logfire extension for VSCode
+# Pydantic Logfire extension for VSCode
 
 A Visual Studio Code extension for the [Logfire platform](https://logfire.pydantic.dev/docs/).
 

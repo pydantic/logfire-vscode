@@ -1,12 +1,12 @@
 {
     "name": "logfire",
-    "displayName": "Logfire",
-    "description": "A Visual Studio Code extension for Logfire.",
+    "displayName": "Pydantic Logfire",
+    "description": "A Visual Studio Code extension for Pydantic Logfire.",
     "icon": "assets/icon.png",
     "version": "2025.3.0",
     "preview": true,
     "serverInfo": {
-        "name": "Logfire",
+        "name": "Pydantic Logfire",
         "module": "logfire"
     },
     "publisher": "Pydantic",
@@ -39,7 +39,7 @@
     "capabilities": {
         "virtualWorkspaces": {
             "supported": false,
-            "description": "Virtual Workspaces are not supported with Logfire."
+            "description": "Virtual Workspaces are not supported with Pydantic Logfire."
         }
     },
     "activationEvents": [
@@ -104,7 +104,7 @@
         "commands": [
             {
                 "title": "Restart Server",
-                "category": "Logfire",
+                "category": "Pydantic Logfire",
                 "command": "logfire.restart"
             }
         ]
