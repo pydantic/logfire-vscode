@@ -22,15 +22,19 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies (${{ matrix.code-target }})
         run: |
           uv sync
-          npm ci
+          pnpm install --frozen-lockfile
 
       - name: Setup bundled dependencies
         run: make setup code-target=${{ matrix.code-target }}
@@ -53,10 +57,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -67,10 +75,10 @@ jobs:
 
       - run: ls -al ./dist
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Publish extension to VSCode Marketplace
-        run: npx vsce publish --packagePath ./dist/logfire-*.vsix --pat ${{ secrets.MARKETPLACE_TOKEN }}
+        run: pnpm exec vsce publish --packagePath ./dist/logfire-*.vsix --pat ${{ secrets.MARKETPLACE_TOKEN }}
 
   publish-open-vsx:
     # Disabled for now.
@@ -83,10 +91,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -97,7 +109,7 @@ jobs:
 
       - run: ls -al ./dist
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Publish extension to Open VSX
-        run: npx ovsx publish --packagePath ./dist/logfire-*.vsix --pat ${{ secrets.OPENVSX_TOKEN }}
+        run: pnpm exec ovsx publish --packagePath ./dist/logfire-*.vsix --pat ${{ secrets.OPENVSX_TOKEN }}

@@ -11,6 +11,7 @@
     },
     "publisher": "Pydantic",
     "license": "MIT",
+    "packageManager": "pnpm@10.33.0",
     "homepage": "https://github.com/pydantic/logfire-vscode",
     "repository": {
         "type": "git",
@@ -63,13 +64,13 @@
     ],
     "main": "./dist/extension.js",
     "scripts": {
-        "vscode:prepublish": "npm run package",
+        "vscode:prepublish": "pnpm run package",
         "compile": "webpack",
         "watch": "webpack --watch",
         "package": "webpack --mode production --devtool source-map --config ./webpack.config.js",
         "compile-tests": "tsc -p . --outDir out",
         "watch-tests": "tsc -p . -w --outDir out",
-        "pretest": "npm run compile-tests && npm run compile && npm run lint",
+        "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
         "lint": "eslint src --ext ts",
         "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
         "format-check": "prettier --check 'src/**/*.ts' 'test/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
@@ -272,5 +273,13 @@
         "vitest": "^1.6.0",
         "webpack": "^5.89.0",
         "webpack-cli": "^5.1.4"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@resvg/resvg-js",
+            "@vscode/vsce-sign",
+            "esbuild",
+            "keytar"
+        ]
     }
 }

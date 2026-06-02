@@ -17,4 +17,4 @@ setup:
 
 .PHONY: build  ## Build the extension for the provided VSCode platform target
 build:
-	npx vsce package -o "./dist/logfire-$(code-target).vsix" --target $(code-target)
+	pnpm exec vsce package -o "./dist/logfire-$(code-target).vsix" --target $(code-target)

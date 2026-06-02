@@ -4,8 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "npm",
-            "script": "watch",
+            "label": "watch",
+            "type": "shell",
+            "command": "pnpm run watch",
             "problemMatcher": ["$ts-webpack-watch", "$tslint-webpack-watch"],
             "isBackground": true,
             "presentation": {
@@ -18,8 +19,9 @@
             }
         },
         {
-            "type": "npm",
-            "script": "watch-tests",
+            "label": "watch-tests",
+            "type": "shell",
+            "command": "pnpm run watch-tests",
             "problemMatcher": "$tsc-watch",
             "isBackground": true,
             "presentation": {
@@ -30,7 +32,7 @@
         },
         {
             "label": "tasks: watch-tests",
-            "dependsOn": ["npm: watch", "npm: watch-tests"],
+            "dependsOn": ["watch", "watch-tests"],
             "problemMatcher": []
         }
     ]
