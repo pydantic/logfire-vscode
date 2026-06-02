@@ -20,6 +20,7 @@ jobs:
       - name: Install uv and Python
         uses: astral-sh/setup-uv@v6
         with:
+          version: 'latest'
           python-version: '3.13'
 
       - name: Install pnpm
