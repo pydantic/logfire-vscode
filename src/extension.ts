@@ -16,9 +16,19 @@ import { checkIfConfigurationChanged, getInterpreterFromSetting } from './common
 import { loadServerDefaults } from './common/setup';
 import { getLSClientTraceLevel } from './common/utilities';
 import { createOutputChannel, onDidChangeConfiguration, registerCommand } from './common/vscodeapi';
+import { activateGateway } from './gateway';
 
 let lsClient: LanguageClient | undefined;
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+  // Logfire AI Gateway: register the LanguageModelChatProvider + commands. This
+  // is independent of the Python language server below, so guard it so a gateway
+  // setup error can't take down the LSP features.
+  try {
+    activateGateway(context);
+  } catch (err) {
+    traceError(`Failed to activate Logfire AI Gateway: ${err}`);
+  }
+
   // This is required to get server name and module. This should be
   // the first thing that we do in this extension.
   const serverInfo = loadServerDefaults();

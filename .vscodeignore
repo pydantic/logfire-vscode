@@ -3,6 +3,10 @@
 out/**
 node_modules/**
 src/**
+test/**
+vitest.config.ts
+assets/pydantic.svg
+assets/example.png
 .gitignore
 .yarnrc
 webpack.config.js

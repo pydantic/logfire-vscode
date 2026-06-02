@@ -1,0 +1,270 @@
+import * as vscode from 'vscode';
+import * as crypto from 'crypto';
+import * as http from 'http';
+import { AddressInfo } from 'net';
+import { Instance, requestTimeoutMs, SCOPE } from './config';
+
+/**
+ * CIMD OAuth client for the Logfire AI Gateway, scoped per instance.
+ *
+ * Flow: authorization-code + PKCE (S256) with a loopback redirect (RFC 8252).
+ * Tokens are short-lived; each instance's refresh token is persisted in VSCode
+ * SecretStorage under its own key, so several instances (US, EU, self-hosted)
+ * can be signed in at the same time.
+ */
+
+const REFRESH_MARGIN_SECONDS = 120;
+const SECRET_PREFIX = 'logfireGateway.refreshToken';
+
+interface OAuthMetadata {
+  authorization_endpoint: string;
+  token_endpoint: string;
+}
+
+interface TokenResponse {
+  access_token: string;
+  refresh_token?: string;
+  expires_in?: number;
+}
+
+interface TokenState {
+  accessToken?: string;
+  refreshToken?: string;
+  expiresAt: number;
+  inflight?: Promise<string>;
+}
+
+function b64url(buf: Buffer): string {
+  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function pkcePair(): { verifier: string; challenge: string } {
+  const verifier = b64url(crypto.randomBytes(32));
+  const challenge = b64url(crypto.createHash('sha256').update(verifier).digest());
+  return { verifier, challenge };
+}
+
+/** GET {backend}/.well-known/oauth-authorization-server */
+async function discover(backend: string): Promise<OAuthMetadata> {
+  const url = `${backend.replace(/\/+$/, '')}/.well-known/oauth-authorization-server`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(requestTimeoutMs()) });
+  if (!res.ok) {
+    throw new Error(`OAuth discovery failed (${res.status}): ${url}`);
+  }
+  const body = (await res.json()) as OAuthMetadata;
+  if (!body.authorization_endpoint || !body.token_endpoint) {
+    throw new Error(`OAuth discovery missing endpoints in ${url}`);
+  }
+  return body;
+}
+
+export class GatewayAuth {
+  private readonly states = new Map<string, TokenState>();
+
+  constructor(private readonly secrets: vscode.SecretStorage) {}
+
+  private secretKey(instance: Instance): string {
+    return `${SECRET_PREFIX}.${instance.id}`;
+  }
+
+  private state(instance: Instance): TokenState {
+    let s = this.states.get(instance.id);
+    if (!s) {
+      s = { expiresAt: 0 };
+      this.states.set(instance.id, s);
+    }
+    return s;
+  }
+
+  /** Drop the in-memory token cache (e.g. on a settings change). */
+  reset(): void {
+    this.states.clear();
+  }
+
+  async isSignedIn(instance: Instance): Promise<boolean> {
+    return Boolean(await this.secrets.get(this.secretKey(instance)));
+  }
+
+  /** Interactive sign-in for one instance. */
+  async signIn(instance: Instance): Promise<void> {
+    this.states.delete(instance.id);
+    const metadata = await discover(instance.backend);
+    const { verifier, challenge } = pkcePair();
+    const state = b64url(crypto.randomBytes(32));
+    const { code, redirectUri } = await this.runLoopbackAuthorize(instance, metadata, challenge, state);
+
+    const token = await this.postToken(metadata, {
+      grant_type: 'authorization_code',
+      code,
+      client_id: instance.clientId,
+      redirect_uri: redirectUri,
+      code_verifier: verifier,
+      resource: instance.resource,
+    });
+    await this.store(instance, token);
+  }
+
+  async signOut(instance: Instance): Promise<void> {
+    this.states.delete(instance.id);
+    await this.secrets.delete(this.secretKey(instance));
+  }
+
+  /** Returns a valid access token for the instance, refreshing as needed. */
+  async currentAccessToken(instance: Instance): Promise<string> {
+    const s = this.state(instance);
+    if (s.inflight) {
+      return s.inflight;
+    }
+    s.inflight = this.acquire(instance).finally(() => {
+      s.inflight = undefined;
+    });
+    return s.inflight;
+  }
+
+  /** Force a refresh after the gateway rejects a token with 401. */
+  async forceRefresh(instance: Instance): Promise<string> {
+    const metadata = await discover(instance.backend);
+    await this.refresh(instance, metadata);
+    const token = this.state(instance).accessToken;
+    if (!token) {
+      throw new Error('refresh did not return an access token');
+    }
+    return token;
+  }
+
+  private async acquire(instance: Instance): Promise<string> {
+    const s = this.state(instance);
+    if (!s.refreshToken) {
+      s.refreshToken = await this.secrets.get(this.secretKey(instance));
+    }
+    const now = Date.now() / 1000;
+    if (s.accessToken && s.expiresAt - now >= REFRESH_MARGIN_SECONDS) {
+      return s.accessToken;
+    }
+    if (!s.refreshToken) {
+      throw new vscode.LanguageModelError(`Not signed in to ${instance.label}. Run "Logfire AI Gateway: Sign In".`);
+    }
+    const metadata = await discover(instance.backend);
+    try {
+      await this.refresh(instance, metadata);
+    } catch (err) {
+      if (now >= s.expiresAt) {
+        throw err;
+      }
+    }
+    if (!s.accessToken) {
+      throw new Error('no access token after refresh');
+    }
+    return s.accessToken;
+  }
+
+  private async refresh(instance: Instance, metadata: OAuthMetadata): Promise<void> {
+    const s = this.state(instance);
+    if (!s.refreshToken) {
+      s.refreshToken = await this.secrets.get(this.secretKey(instance));
+    }
+    if (!s.refreshToken) {
+      throw new Error('no refresh token; reauthorize');
+    }
+    const token = await this.postToken(metadata, {
+      grant_type: 'refresh_token',
+      refresh_token: s.refreshToken,
+      client_id: instance.clientId,
+      resource: instance.resource,
+    });
+    await this.store(instance, token);
+  }
+
+  private async postToken(metadata: OAuthMetadata, form: Record<string, string>): Promise<TokenResponse> {
+    const res = await fetch(metadata.token_endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(form).toString(),
+      signal: AbortSignal.timeout(requestTimeoutMs()),
+    });
+    if (!res.ok) {
+      throw new Error(`token request failed (${res.status}): ${await res.text()}`);
+    }
+    return (await res.json()) as TokenResponse;
+  }
+
+  private async store(instance: Instance, token: TokenResponse): Promise<void> {
+    const s = this.state(instance);
+    s.accessToken = token.access_token;
+    if (token.refresh_token) {
+      s.refreshToken = token.refresh_token;
+      await this.secrets.store(this.secretKey(instance), token.refresh_token);
+    }
+    s.expiresAt = Date.now() / 1000 + (token.expires_in ?? 3600);
+  }
+
+  /**
+   * Spin up a one-shot loopback server (RFC 8252), open the system browser to
+   * the authorization endpoint, and resolve with the returned code. Uses
+   * vscode.env.openExternal so it works in remote/web hosts too.
+   */
+  private runLoopbackAuthorize(
+    instance: Instance,
+    metadata: OAuthMetadata,
+    challenge: string,
+    state: string,
+  ): Promise<{ code: string; redirectUri: string }> {
+    return new Promise((resolve, reject) => {
+      const server = http.createServer((req, res) => {
+        try {
+          const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+          if (url.pathname !== '/callback') {
+            res.writeHead(404).end();
+            return;
+          }
+          const error = url.searchParams.get('error');
+          const code = url.searchParams.get('code');
+          const returnedState = url.searchParams.get('state');
+          res.writeHead(200, { 'content-type': 'text/html' });
+          res.end(
+            '<!doctype html><title>Logfire Gateway</title>' +
+              `<h1>${error ? 'Authorization failed' : 'Authorized'}</h1>` +
+              '<p>You can close this tab and return to VSCode.</p>',
+          );
+          server.close();
+          if (error) {
+            reject(new Error(`authorization failed: ${error}`));
+          } else if (!code || returnedState !== state) {
+            reject(new Error('invalid or missing code/state'));
+          } else {
+            resolve({ code, redirectUri });
+          }
+        } catch (e) {
+          reject(e as Error);
+        }
+      });
+
+      let redirectUri = '';
+      server.listen(0, '127.0.0.1', async () => {
+        const port = (server.address() as AddressInfo).port;
+        redirectUri = `http://127.0.0.1:${port}/callback`;
+        const params = new URLSearchParams({
+          response_type: 'code',
+          client_id: instance.clientId,
+          redirect_uri: redirectUri,
+          scope: SCOPE,
+          state,
+          resource: instance.resource,
+          code_challenge: challenge,
+          code_challenge_method: 'S256',
+        });
+        const authorizeUrl = `${metadata.authorization_endpoint}?${params.toString()}`;
+        const opened = await vscode.env.openExternal(vscode.Uri.parse(authorizeUrl));
+        if (!opened) {
+          server.close();
+          reject(new Error('failed to open browser for authorization'));
+        }
+      });
+
+      setTimeout(() => {
+        server.close();
+        reject(new Error('authorization timed out'));
+      }, 600_000).unref?.();
+    });
+  }
+}

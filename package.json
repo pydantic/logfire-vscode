@@ -1,7 +1,7 @@
 {
     "name": "logfire",
     "displayName": "Pydantic Logfire",
-    "description": "A Visual Studio Code extension for Pydantic Logfire.",
+    "description": "A Visual Studio Code extension for Pydantic Logfire: Live View CodeLens for your logging calls, plus the Logfire AI Gateway as a Chat model provider (CIMD OAuth, no API key).",
     "icon": "assets/icon.png",
     "version": "2025.3.0",
     "preview": true,
@@ -25,13 +25,27 @@
     },
     "keywords": [
         "python",
-        "logfire"
+        "logfire",
+        "pydantic",
+        "llm",
+        "openai",
+        "anthropic",
+        "ai-gateway",
+        "byok",
+        "copilot",
+        "otel",
+        "opentelemetry",
+        "observability",
+        "oauth"
     ],
     "engines": {
-        "vscode": "^1.78.0"
+        "vscode": "^1.104.0"
     },
     "categories": [
-        "Programming Languages"
+        "Programming Languages",
+        "AI",
+        "Chat",
+        "Machine Learning"
     ],
     "extensionDependencies": [
         "ms-python.python"
@@ -44,7 +58,8 @@
     },
     "activationEvents": [
         "onLanguage:python",
-        "workspaceContains:*.py"
+        "workspaceContains:*.py",
+        "onLanguageModelChatProvider:logfire-gateway"
     ],
     "main": "./dist/extension.js",
     "scripts": {
@@ -56,9 +71,12 @@
         "watch-tests": "tsc -p . -w --outDir out",
         "pretest": "npm run compile-tests && npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
-        "format": "prettier --write 'src/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
-        "format-check": "prettier --check 'src/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
-        "test": "node ./out/test/runTest.js"
+        "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
+        "format-check": "prettier --check 'src/**/*.ts' 'test/**/*.ts' 'build/**/*.yml' '.github/**/*.yml'",
+        "test": "node ./out/test/runTest.js",
+        "test:unit": "vitest run",
+        "test:unit:watch": "vitest",
+        "gen:icon": "node scripts/gen-icon.mjs"
     },
     "contributes": {
         "configuration": {
@@ -98,14 +116,129 @@
                     ],
                     "scope": "machine",
                     "type": "string"
+                },
+                "logfireGateway.regions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "us",
+                            "eu"
+                        ]
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "us",
+                        "eu"
+                    ],
+                    "markdownDescription": "Hosted Logfire deployments to make available. Sign in to any subset — models from every signed-in instance appear together in the picker."
+                },
+                "logfireGateway.instances": {
+                    "type": "array",
+                    "default": [],
+                    "markdownDescription": "Self-hosted Logfire instances, in addition to the hosted regions. Each needs an `alias` (shown in the picker) and a base `url` that serves both OAuth and the gateway, or split `backendUrl`/`gatewayUrl`.",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "alias"
+                        ],
+                        "properties": {
+                            "alias": {
+                                "type": "string",
+                                "description": "Display name, e.g. \"Acme prod\"."
+                            },
+                            "url": {
+                                "type": "string",
+                                "description": "Base URL serving OAuth and gateway, e.g. https://logfire.example.com."
+                            },
+                            "backendUrl": {
+                                "type": "string",
+                                "description": "OAuth backend URL (overrides 'url' for split deployments)."
+                            },
+                            "gatewayUrl": {
+                                "type": "string",
+                                "description": "Gateway URL (overrides 'url' for split deployments)."
+                            },
+                            "clientId": {
+                                "type": "string",
+                                "description": "CIMD client_id URL to authenticate as. Optional — defaults to https://logfire.pydantic.dev/clients/logfire-gateway.json, which works for self-hosted/localhost backends that can't serve their own CIMD document."
+                            }
+                        }
+                    }
+                },
+                "logfireGateway.requestTimeoutMs": {
+                    "type": "number",
+                    "default": 180000,
+                    "minimum": 5000,
+                    "maximum": 600000,
+                    "description": "Upstream request timeout in milliseconds."
+                },
+                "logfireGateway.modelRefreshIntervalMinutes": {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 0,
+                    "maximum": 1440,
+                    "description": "How often to refresh the model list, in minutes. Set to 0 to disable automatic refresh (use the \"Refresh Model List\" command instead)."
+                },
+                "logfireGateway.modelOverrides": {
+                    "type": "object",
+                    "default": {},
+                    "description": "Per-model metadata overrides keyed by bare model id or namespaced 'instance::route::model' id, e.g. { \"gpt-4o\": { \"maxInputTokens\": 128000, \"toolCalling\": true, \"imageInput\": true } }.",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "maxInputTokens": {
+                                "type": "number"
+                            },
+                            "maxOutputTokens": {
+                                "type": "number"
+                            },
+                            "toolCalling": {
+                                "type": "boolean"
+                            },
+                            "imageInput": {
+                                "type": "boolean"
+                            },
+                            "family": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         },
+        "languageModelChatProviders": [
+            {
+                "vendor": "logfire-gateway",
+                "displayName": "Logfire AI Gateway",
+                "managementCommand": "logfireGateway.manage"
+            }
+        ],
         "commands": [
             {
                 "title": "Restart Server",
                 "category": "Pydantic Logfire",
                 "command": "logfire.restart"
+            },
+            {
+                "command": "logfireGateway.signIn",
+                "title": "Logfire AI Gateway: Sign In",
+                "category": "Logfire"
+            },
+            {
+                "command": "logfireGateway.signOut",
+                "title": "Logfire AI Gateway: Sign Out",
+                "category": "Logfire"
+            },
+            {
+                "command": "logfireGateway.manage",
+                "title": "Logfire AI Gateway: Manage",
+                "category": "Logfire"
+            },
+            {
+                "command": "logfireGateway.refreshModels",
+                "title": "Logfire AI Gateway: Refresh Model List",
+                "category": "Logfire"
             }
         ]
     },
@@ -121,10 +254,11 @@
         "vscode-languageclient": "^8.1.0"
     },
     "devDependencies": {
+        "@resvg/resvg-js": "^2.6.2",
         "@types/fs-extra": "^11.0.4",
         "@types/glob": "^8.1.0",
         "@types/node": "20.x",
-        "@types/vscode": "1.78.0",
+        "@types/vscode": "^1.104.0",
         "@typescript-eslint/eslint-plugin": "^6.17.0",
         "@typescript-eslint/parser": "^6.17.0",
         "@vscode/test-electron": "^2.3.8",
@@ -135,6 +269,7 @@
         "prettier": "^3.1.1",
         "ts-loader": "^9.5.1",
         "typescript": "^5.3.3",
+        "vitest": "^1.6.0",
         "webpack": "^5.89.0",
         "webpack-cli": "^5.1.4"
     }
