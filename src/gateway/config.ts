@@ -5,9 +5,11 @@ import * as vscode from 'vscode';
  * active at once — built-in hosted regions plus any number of self-hosted
  * instances, each identified by an alias.
  *
- * The OAuth client is a public client identified by a CIMD (Client ID Metadata
- * Document) URL, derived from the backend host (see `cimdClientId`), so the
- * loopback redirect is allowed without per-instance registration.
+ * The OAuth client is registered per instance at sign-in via RFC 7591 Dynamic
+ * Client Registration (see `registration.ts` / `GatewayAuth`). The `clientId`
+ * field below is the legacy CIMD (Client ID Metadata Document) identity; it is
+ * retained for configuration/back-compat and is *not* used by the active DCR
+ * flow.
  */
 export interface Instance {
   /** Stable key, e.g. `us`, `eu`, `stagingeu`, or `custom:acme-prod`. */
@@ -16,6 +18,7 @@ export interface Instance {
   label: string;
   backend: string;
   gateway: string;
+  /** Legacy CIMD client-id URL (unused by the DCR flow; kept for config compat). */
   clientId: string;
   /** RFC 8707 resource indicator: `{gateway}/proxy`. */
   resource: string;
@@ -38,8 +41,16 @@ const REGION_PRESETS: Record<string, RegionPreset> = {
   },
 };
 
-/** OAuth scope the gateway requires on issued tokens. */
-export const SCOPE = 'project:gateway_proxy';
+/**
+ * OAuth scopes the extension requires on issued tokens. This is the single
+ * source of truth: the DCR client is registered for exactly these scopes, and
+ * when this set changes the client is automatically re-registered (see
+ * `needsReregistration` in `registration.ts`).
+ */
+export const REQUIRED_SCOPES = ['project:gateway_proxy'];
+
+/** Space-delimited `scope` parameter sent on authorize/registration requests. */
+export const SCOPE = REQUIRED_SCOPES.join(' ');
 
 const CIMD_PATH = '/clients/logfire-gateway.json';
 

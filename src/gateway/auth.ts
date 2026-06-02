@@ -2,10 +2,16 @@ import * as vscode from 'vscode';
 import * as crypto from 'crypto';
 import * as http from 'http';
 import { AddressInfo } from 'net';
-import { Instance, requestTimeoutMs, SCOPE } from './config';
+import { Instance, REQUIRED_SCOPES, requestTimeoutMs, SCOPE } from './config';
+import { ClientRegistration, needsReregistration, RegistrationStore, RegistrationSummary } from './registration';
 
 /**
- * CIMD OAuth client for the Logfire AI Gateway, scoped per instance.
+ * OAuth client for the Logfire AI Gateway, scoped per instance.
+ *
+ * The client is established via RFC 7591 Dynamic Client Registration: at
+ * sign-in the extension registers a public OAuth client for the instance and
+ * persists the issued `client_id` (and RFC 7592 management token). The client
+ * is re-registered automatically whenever the required scope set changes.
  *
  * Flow: authorization-code + PKCE (S256) with a loopback redirect (RFC 8252).
  * Tokens are short-lived; each instance's refresh token is persisted in VSCode
@@ -15,10 +21,24 @@ import { Instance, requestTimeoutMs, SCOPE } from './config';
 
 const REFRESH_MARGIN_SECONDS = 120;
 const SECRET_PREFIX = 'logfireGateway.refreshToken';
+const CLIENT_NAME = 'Logfire AI Gateway (VS Code)';
+/** Loopback redirect registered with the AS; the port varies per sign-in and
+ * is ignored for loopback hosts per RFC 8252 §7.3, so a port-less value is the
+ * stable thing to register. */
+const REGISTERED_REDIRECT_URI = 'http://127.0.0.1/callback';
 
 interface OAuthMetadata {
   authorization_endpoint: string;
   token_endpoint: string;
+  registration_endpoint?: string;
+}
+
+/** RFC 7591 client information response (subset we consume). */
+interface DCRResponse {
+  client_id: string;
+  registration_access_token: string;
+  registration_client_uri: string;
+  scope?: string;
 }
 
 interface TokenResponse {
@@ -61,10 +81,17 @@ async function discover(backend: string): Promise<OAuthMetadata> {
 export class GatewayAuth {
   private readonly states = new Map<string, TokenState>();
 
-  constructor(private readonly secrets: vscode.SecretStorage) {}
+  constructor(
+    private readonly secrets: vscode.SecretStorage,
+    private readonly registrations: RegistrationStore,
+  ) {}
 
   private secretKey(instance: Instance): string {
-    return `${SECRET_PREFIX}.${instance.id}`;
+    return this.secretKeyForId(instance.id);
+  }
+
+  private secretKeyForId(instanceId: string): string {
+    return `${SECRET_PREFIX}.${instanceId}`;
   }
 
   private state(instance: Instance): TokenState {
@@ -89,14 +116,21 @@ export class GatewayAuth {
   async signIn(instance: Instance): Promise<void> {
     this.states.delete(instance.id);
     const metadata = await discover(instance.backend);
+    const registration = await this.ensureRegisteredClient(instance, metadata);
     const { verifier, challenge } = pkcePair();
     const state = b64url(crypto.randomBytes(32));
-    const { code, redirectUri } = await this.runLoopbackAuthorize(instance, metadata, challenge, state);
+    const { code, redirectUri } = await this.runLoopbackAuthorize(
+      instance,
+      registration.clientId,
+      metadata,
+      challenge,
+      state,
+    );
 
     const token = await this.postToken(metadata, {
       grant_type: 'authorization_code',
       code,
-      client_id: instance.clientId,
+      client_id: registration.clientId,
       redirect_uri: redirectUri,
       code_verifier: verifier,
       resource: instance.resource,
@@ -107,6 +141,111 @@ export class GatewayAuth {
   async signOut(instance: Instance): Promise<void> {
     this.states.delete(instance.id);
     await this.secrets.delete(this.secretKey(instance));
+  }
+
+  /** Non-secret summaries of every dynamically-registered client. */
+  listRegistrations(): RegistrationSummary[] {
+    return this.registrations.list();
+  }
+
+  /**
+   * Unregister a dynamically-registered client (RFC 7592 DELETE) and, per the
+   * requirement that an unregistered client must not leave a usable session
+   * behind, always remove its stored refresh token and local registration —
+   * even if the server-side delete can't be confirmed (e.g. offline).
+   *
+   * Returns whether the server acknowledged the deletion.
+   */
+  async unregisterClient(instanceId: string): Promise<{ serverDeleted: boolean }> {
+    const registration = await this.registrations.get(instanceId);
+    let serverDeleted = false;
+    if (registration) {
+      try {
+        const res = await fetch(registration.registrationClientUri, {
+          method: 'DELETE',
+          headers: { authorization: `Bearer ${registration.registrationAccessToken}` },
+          signal: AbortSignal.timeout(requestTimeoutMs()),
+        });
+        // 204 = deleted; 401 = client/token already gone — both mean "no client left".
+        serverDeleted = res.ok || res.status === 401;
+      } catch {
+        // Best-effort: a network failure must not block local cleanup below.
+      }
+    }
+    this.states.delete(instanceId);
+    await this.secrets.delete(this.secretKeyForId(instanceId));
+    await this.registrations.delete(instanceId);
+    return { serverDeleted };
+  }
+
+  /**
+   * Return a registered client for the instance, registering (or re-registering
+   * on a backend/scope change) as needed. A re-registration invalidates any
+   * previous client and its tokens, so the old refresh token is cleared and the
+   * user is prompted to sign in again.
+   */
+  private async ensureRegisteredClient(instance: Instance, metadata: OAuthMetadata): Promise<ClientRegistration> {
+    const existing = await this.registrations.get(instance.id);
+    if (!needsReregistration(existing, instance.backend, REQUIRED_SCOPES)) {
+      return existing as ClientRegistration;
+    }
+    if (existing) {
+      // Replacing the client: drop the now-stale session before swapping it.
+      await this.unregisterClient(instance.id);
+    }
+    return this.registerClient(instance, metadata);
+  }
+
+  /** RFC 7591 Dynamic Client Registration of a public (PKCE) client. */
+  private async registerClient(instance: Instance, metadata: OAuthMetadata): Promise<ClientRegistration> {
+    if (!metadata.registration_endpoint) {
+      throw new Error(
+        `${instance.label} does not support dynamic client registration (no registration_endpoint). Upgrade Logfire.`,
+      );
+    }
+    const res = await fetch(metadata.registration_endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        client_name: CLIENT_NAME,
+        redirect_uris: [REGISTERED_REDIRECT_URI],
+        grant_types: ['authorization_code', 'refresh_token'],
+        response_types: ['code'],
+        token_endpoint_auth_method: 'none',
+        application_type: 'native',
+        scope: SCOPE,
+      }),
+      signal: AbortSignal.timeout(requestTimeoutMs()),
+    });
+    if (!res.ok) {
+      throw new Error(`client registration failed (${res.status}): ${await res.text()}`);
+    }
+    const body = (await res.json()) as DCRResponse;
+    if (!body.client_id || !body.registration_access_token || !body.registration_client_uri) {
+      throw new Error('client registration response missing client_id / registration fields');
+    }
+    const registration: ClientRegistration = {
+      instanceId: instance.id,
+      instanceLabel: instance.label,
+      backend: instance.backend,
+      clientId: body.client_id,
+      registrationAccessToken: body.registration_access_token,
+      registrationClientUri: body.registration_client_uri,
+      scopes: [...REQUIRED_SCOPES].sort(),
+      clientName: CLIENT_NAME,
+      registeredAt: Date.now(),
+    };
+    await this.registrations.save(registration);
+    return registration;
+  }
+
+  /** The current client_id for an instance, or throw if not registered. */
+  private async clientId(instance: Instance): Promise<string> {
+    const registration = await this.registrations.get(instance.id);
+    if (!registration) {
+      throw new vscode.LanguageModelError(`Not signed in to ${instance.label}. Run "Logfire AI Gateway: Sign In".`);
+    }
+    return registration.clientId;
   }
 
   /** Returns a valid access token for the instance, refreshing as needed. */
@@ -169,7 +308,7 @@ export class GatewayAuth {
     const token = await this.postToken(metadata, {
       grant_type: 'refresh_token',
       refresh_token: s.refreshToken,
-      client_id: instance.clientId,
+      client_id: await this.clientId(instance),
       resource: instance.resource,
     });
     await this.store(instance, token);
@@ -205,6 +344,7 @@ export class GatewayAuth {
    */
   private runLoopbackAuthorize(
     instance: Instance,
+    clientId: string,
     metadata: OAuthMetadata,
     challenge: string,
     state: string,
@@ -245,7 +385,7 @@ export class GatewayAuth {
         redirectUri = `http://127.0.0.1:${port}/callback`;
         const params = new URLSearchParams({
           response_type: 'code',
-          client_id: instance.clientId,
+          client_id: clientId,
           redirect_uri: redirectUri,
           scope: SCOPE,
           state,

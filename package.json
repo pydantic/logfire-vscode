@@ -237,6 +237,11 @@
                 "category": "Logfire"
             },
             {
+                "command": "logfireGateway.manageClients",
+                "title": "Logfire AI Gateway: Manage Registered Clients",
+                "category": "Logfire"
+            },
+            {
                 "command": "logfireGateway.refreshModels",
                 "title": "Logfire AI Gateway: Refresh Model List",
                 "category": "Logfire"

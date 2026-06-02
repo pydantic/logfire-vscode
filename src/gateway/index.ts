@@ -1,17 +1,19 @@
 // Logfire AI Gateway feature: registers a LanguageModelChatProvider backed by
-// one or more Logfire AI Gateway instances (CIMD OAuth, auto region). This is
+// one or more Logfire AI Gateway instances (DCR OAuth, auto region). This is
 // wired into the extension's main activate() in src/extension.ts.
 import * as vscode from 'vscode';
 import { GatewayAuth } from './auth';
 import { GatewayAccessError, GatewayClient } from './gateway';
 import { LogfireGatewayProvider } from './provider';
 import { Instance, listInstances, modelOverrides } from './config';
+import { RegistrationStore, RegistrationSummary } from './registration';
 import { StatusBar } from './statusbar';
 
 const VENDOR = 'logfire-gateway';
 
 export function activateGateway(context: vscode.ExtensionContext): void {
-  const auth = new GatewayAuth(context.secrets);
+  const registrations = new RegistrationStore(context.secrets, context.globalState);
+  const auth = new GatewayAuth(context.secrets, registrations);
   const client = new GatewayClient(auth);
   const statusBar = new StatusBar();
   context.subscriptions.push(statusBar);
@@ -167,10 +169,81 @@ export function activateGateway(context: vscode.ExtensionContext): void {
     vscode.window.showInformationMessage('Refreshing Logfire AI Gateway models…');
   };
 
+  // List the OAuth clients this extension has dynamically registered (RFC 7591)
+  // and let the user unregister them. Unregistering deletes the client from
+  // Logfire (RFC 7592) and removes its stored sign-in for the same client.
+  type ClientItem = vscode.QuickPickItem & { summary: RegistrationSummary };
+  const manageClients = async (): Promise<void> => {
+    const toItem = (r: RegistrationSummary): ClientItem => ({
+      label: r.instanceLabel,
+      description: r.clientId,
+      detail: `scopes: ${r.scopes.join(', ')} • registered ${new Date(r.registeredAt).toLocaleString()}`,
+      buttons: [{ iconPath: new vscode.ThemeIcon('trash'), tooltip: 'Unregister client' }],
+      summary: r,
+    });
+    const render = (): ClientItem[] =>
+      auth
+        .listRegistrations()
+        .sort((a, b) => a.instanceLabel.localeCompare(b.instanceLabel))
+        .map(toItem);
+
+    if (render().length === 0) {
+      vscode.window.showInformationMessage('No registered Logfire AI Gateway clients.');
+      return;
+    }
+
+    const qp = vscode.window.createQuickPick<ClientItem>();
+    qp.title = 'Logfire AI Gateway — registered clients';
+    qp.placeholder = 'Select a client to unregister (deletes it from Logfire and clears its stored sign-in)';
+    qp.items = render();
+
+    const unregister = async (summary: RegistrationSummary): Promise<void> => {
+      const choice = await vscode.window.showWarningMessage(
+        `Unregister the Logfire AI Gateway client for ${summary.instanceLabel}? ` +
+          'This deletes it from Logfire and removes its stored sign-in.',
+        { modal: true },
+        'Unregister',
+      );
+      if (choice !== 'Unregister') {
+        return;
+      }
+      let serverDeleted = false;
+      try {
+        ({ serverDeleted } = await auth.unregisterClient(summary.instanceId));
+      } catch (err) {
+        vscode.window.showErrorMessage(`Failed to unregister ${summary.instanceLabel}: ${(err as Error).message}`);
+        return;
+      }
+      provider.refresh();
+      void refreshStatus();
+      vscode.window.showInformationMessage(
+        serverDeleted
+          ? `Unregistered Logfire AI Gateway client for ${summary.instanceLabel}.`
+          : `Removed local client for ${summary.instanceLabel} (server deregistration could not be confirmed).`,
+      );
+      const remaining = render();
+      qp.items = remaining;
+      if (remaining.length === 0) {
+        qp.hide();
+      }
+    };
+
+    qp.onDidTriggerItemButton((e) => void unregister(e.item.summary));
+    qp.onDidAccept(() => {
+      const selected = qp.selectedItems[0];
+      if (selected) {
+        void unregister(selected.summary);
+      }
+    });
+    qp.onDidHide(() => qp.dispose());
+    qp.show();
+  };
+
   context.subscriptions.push(
     vscode.commands.registerCommand('logfireGateway.signIn', signIn),
     vscode.commands.registerCommand('logfireGateway.signOut', signOut),
     vscode.commands.registerCommand('logfireGateway.manage', manage),
+    vscode.commands.registerCommand('logfireGateway.manageClients', manageClients),
     vscode.commands.registerCommand('logfireGateway.refreshModels', refreshModels),
   );
 }
