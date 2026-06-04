@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.9"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -211,21 +211,21 @@ wheels = [
 
 [[package]]
 name = "logfire-lsp"
-version = "0.0.3"
+version = "0.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "libcst" },
     { name = "pygls" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3b/a3/2922d4797596cb30c201313484e5e3d96f98c9dd6743b08b12b89b2b267d/logfire_lsp-0.0.3.tar.gz", hash = "sha256:8ea4fbb4c927574943d7e76f67b085e32931f86e8920dd30a79a44ec0d41b9f5", size = 50191, upload-time = "2025-06-27T15:56:52.934Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/42/8d/c4382d0b4e11c19531c7fd083f8f275a01b1c459ccfc114a01a46b64f289/logfire_lsp-0.0.4.tar.gz", hash = "sha256:2be8b2e802cb066deffe7fe2dadab966dda98b84af0409d386de5f6b7a67121c", size = 50192, upload-time = "2025-06-29T12:51:39.801Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ee/17/1c2f2eba7552190eb9d6cbcd6c4e8d50348ad742b70baf1145eb9c8f4be1/logfire_lsp-0.0.3-py3-none-any.whl", hash = "sha256:9d9891c9a9f7f6c8f340cb4c72f66d607752cc2c7280e35121a637143415a651", size = 6999, upload-time = "2025-06-27T15:56:51.8Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/e7/95678bd24b0a7769d1dde45f317e1a7b5e02812f1272f77c28b95a81366d/logfire_lsp-0.0.4-py3-none-any.whl", hash = "sha256:e1a047a6dd91edfef2336d52aaea558ce519585c57369dc9f32cee0f6bfbd413", size = 6996, upload-time = "2025-06-29T12:51:38.511Z" },
 ]
 
 [[package]]
 name = "logfire-vscode"
-version = "2025.1.0"
+version = "2026.6.0"
 source = { virtual = "." }
 dependencies = [
     { name = "logfire-lsp" },
@@ -239,7 +239,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "logfire-lsp", specifier = "==0.0.3" }]
+requires-dist = [{ name = "logfire-lsp", specifier = "==0.0.4" }]
 
 [package.metadata.requires-dev]
 dev = [

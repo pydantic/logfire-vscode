@@ -1,9 +1,9 @@
 {
     "name": "logfire",
     "displayName": "Pydantic Logfire",
-    "description": "A Visual Studio Code extension for Pydantic Logfire: Live View CodeLens for your logging calls, plus the Logfire AI Gateway as a Chat model provider (CIMD OAuth, no API key).",
+    "description": "A Visual Studio Code extension for Pydantic Logfire: Live View CodeLens for your logging calls, plus the Logfire AI Gateway as a Chat model provider (OAuth via Dynamic Client Registration, no API key).",
     "icon": "assets/icon.png",
-    "version": "2025.3.0",
+    "version": "2026.6.0",
     "preview": true,
     "serverInfo": {
         "name": "Pydantic Logfire",
@@ -162,7 +162,7 @@
                             },
                             "clientId": {
                                 "type": "string",
-                                "description": "CIMD client_id URL to authenticate as. Optional — defaults to https://logfire.pydantic.dev/clients/logfire-gateway.json, which works for self-hosted/localhost backends that can't serve their own CIMD document."
+                                "description": "Optional static OAuth client_id to authenticate as (e.g. a CIMD client_id URL you registered yourself). When set, sign-in uses it directly and skips Dynamic Client Registration (RFC 7591); when omitted, the extension registers a client automatically via DCR."
                             }
                         }
                     }

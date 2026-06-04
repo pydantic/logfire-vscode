@@ -1,6 +1,6 @@
 [project]
 name = "logfire-vscode"
-version = "2025.3.0"
+version = "2026.6.0"
 description = "A Visual Studio Code extension for Pydantic Logfire"
 authors = [
     {name = "Victorien Plot", email = "contact@vctrn.dev"},

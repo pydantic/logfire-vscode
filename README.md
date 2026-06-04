@@ -40,7 +40,8 @@ Key settings (`logfireGateway.*`):
 
 - `logfireGateway.regions` (default `["us", "eu"]`) — which hosted deployments are available.
 - `logfireGateway.instances` — self-hosted deployments, each with an `alias` and a base `url`
-  (or split `backendUrl`/`gatewayUrl`).
+  (or split `backendUrl`/`gatewayUrl`). Set an optional `clientId` on an entry to authenticate with
+  a static OAuth client you registered yourself, skipping Dynamic Client Registration.
 - `logfireGateway.requestTimeoutMs`, `logfireGateway.modelRefreshIntervalMinutes`,
   `logfireGateway.modelOverrides` — request timeout, model-list refresh cadence, and per-model
   metadata overrides.
@@ -48,3 +49,16 @@ Key settings (`logfireGateway.*`):
 The status bar shows the signed-in instances and an **estimated** spend for the current VSCode
 session (summed from the gateway's per-request price-estimate header). It does not show account-wide
 spend or limits — that data isn't exposed by the gateway's OAuth surface.
+
+## Commands
+
+All commands are available from the Command Palette (`Cmd`/`Ctrl`+`Shift`+`P`).
+
+| Command | Description |
+| --- | --- |
+| **Pydantic Logfire: Restart Server** | Restart the bundled Logfire language server (CodeLens / Live View). |
+| **Logfire AI Gateway: Sign In** | Authenticate to a Logfire deployment (OAuth + Dynamic Client Registration) and make its models available. |
+| **Logfire AI Gateway: Sign Out** | Remove the stored sign-in for a deployment. |
+| **Logfire AI Gateway: Manage** | List every configured instance with its signed-in state; sign in/out or open settings. Also reachable from the model picker. |
+| **Logfire AI Gateway: Manage Registered Clients** | List the OAuth clients the extension has registered and unregister them (RFC 7592 — deletes the client from Logfire and clears its stored sign-in). |
+| **Logfire AI Gateway: Refresh Model List** | Re-query the available models from every signed-in deployment. |

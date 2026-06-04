@@ -5,11 +5,13 @@ import * as vscode from 'vscode';
  * active at once — built-in hosted regions plus any number of self-hosted
  * instances, each identified by an alias.
  *
- * The OAuth client is registered per instance at sign-in via RFC 7591 Dynamic
- * Client Registration (see `registration.ts` / `GatewayAuth`). The `clientId`
- * field below is the legacy CIMD (Client ID Metadata Document) identity; it is
- * retained for configuration/back-compat and is *not* used by the active DCR
- * flow.
+ * By default the OAuth client is registered per instance at sign-in via RFC 7591
+ * Dynamic Client Registration (see `registration.ts` / `GatewayAuth`). A user can
+ * instead provide an explicit `clientId` on a `logfireGateway.instances` entry
+ * (surfaced here as `staticClientId`); when set, sign-in uses that client id
+ * directly and skips DCR — handy for backends that don't support DCR or for
+ * registering your own CIMD client. The derived `clientId` field is a CIMD
+ * (Client ID Metadata Document) URL kept for back-compat/display.
  */
 export interface Instance {
   /** Stable key, e.g. `us`, `eu`, `stagingeu`, or `custom:acme-prod`. */
@@ -18,8 +20,15 @@ export interface Instance {
   label: string;
   backend: string;
   gateway: string;
-  /** Legacy CIMD client-id URL (unused by the DCR flow; kept for config compat). */
+  /** Derived CIMD client-id URL for the backend (informational; the active flow
+   * uses `staticClientId` when set, otherwise a DCR-registered client). */
   clientId: string;
+  /**
+   * User-provided static OAuth client_id (from `logfireGateway.instances[].clientId`).
+   * When set, sign-in uses it directly and skips Dynamic Client Registration.
+   * Undefined for built-in regions and instances without an explicit clientId.
+   */
+  staticClientId?: string;
   /** RFC 8707 resource indicator: `{gateway}/proxy`. */
   resource: string;
   builtin: boolean;
@@ -102,9 +111,10 @@ interface CustomInstanceConfig {
   backendUrl?: string;
   gatewayUrl?: string;
   /**
-   * CIMD client_id URL to authenticate as. Optional — when omitted, the
-   * hosted `DEFAULT_CIMD_CLIENT_ID` is used (self-hosted/localhost backends
-   * can't serve a CIMD doc the auth server will accept).
+   * Optional static OAuth client_id to authenticate as (e.g. a CIMD client_id
+   * URL you registered yourself). When set, sign-in uses it directly and skips
+   * Dynamic Client Registration; when omitted, the extension registers a client
+   * automatically via DCR.
    */
   clientId?: string;
 }
@@ -134,6 +144,8 @@ function makeInstance(
     backend,
     gateway,
     clientId: clientId || cimdClientId(backend),
+    // Only an explicitly-provided clientId becomes a static (DCR-skipping) client.
+    staticClientId: clientId,
     resource: `${gateway}/proxy`,
     builtin,
   };

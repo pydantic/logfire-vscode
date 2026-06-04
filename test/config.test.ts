@@ -48,6 +48,7 @@ describe('listInstances', () => {
     expect(i.gateway).toBe('https://logfire.acme.com');
     expect(i.resource).toBe('https://logfire.acme.com/proxy');
     expect(i.clientId).toBe(DEFAULT_CIMD_CLIENT_ID);
+    expect(i.staticClientId).toBeUndefined();
     expect(i.builtin).toBe(false);
   });
 
@@ -67,6 +68,12 @@ describe('listInstances', () => {
     expect(i.backend).toBe('https://auth.lab');
     expect(i.gateway).toBe('https://gw.lab');
     expect(i.clientId).toBe('https://lab/clients/x.json');
+    // An explicit clientId is exposed as a static (DCR-skipping) client id.
+    expect(i.staticClientId).toBe('https://lab/clients/x.json');
+  });
+
+  it('leaves staticClientId unset for built-in regions', () => {
+    expect(listInstances().every((i) => i.staticClientId === undefined)).toBe(true);
   });
 
   it('skips incomplete custom entries', () => {

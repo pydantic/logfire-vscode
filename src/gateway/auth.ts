@@ -11,7 +11,9 @@ import { ClientRegistration, needsReregistration, RegistrationStore, Registratio
  * The client is established via RFC 7591 Dynamic Client Registration: at
  * sign-in the extension registers a public OAuth client for the instance and
  * persists the issued `client_id` (and RFC 7592 management token). The client
- * is re-registered automatically whenever the required scope set changes.
+ * is re-registered automatically whenever the required scope set changes. If an
+ * instance configures a static `clientId`, that client id is used directly and
+ * DCR is skipped (the client isn't tracked in the registration store).
  *
  * Flow: authorization-code + PKCE (S256) with a loopback redirect (RFC 8252).
  * Tokens are short-lived; each instance's refresh token is persisted in VSCode
@@ -116,21 +118,15 @@ export class GatewayAuth {
   async signIn(instance: Instance): Promise<void> {
     this.states.delete(instance.id);
     const metadata = await discover(instance.backend);
-    const registration = await this.ensureRegisteredClient(instance, metadata);
+    const clientId = await this.resolveClientId(instance, metadata);
     const { verifier, challenge } = pkcePair();
     const state = b64url(crypto.randomBytes(32));
-    const { code, redirectUri } = await this.runLoopbackAuthorize(
-      instance,
-      registration.clientId,
-      metadata,
-      challenge,
-      state,
-    );
+    const { code, redirectUri } = await this.runLoopbackAuthorize(instance, clientId, metadata, challenge, state);
 
     const token = await this.postToken(metadata, {
       grant_type: 'authorization_code',
       code,
-      client_id: registration.clientId,
+      client_id: clientId,
       redirect_uri: redirectUri,
       code_verifier: verifier,
       resource: instance.resource,
@@ -176,6 +172,18 @@ export class GatewayAuth {
     await this.secrets.delete(this.secretKeyForId(instanceId));
     await this.registrations.delete(instanceId);
     return { serverDeleted };
+  }
+
+  /**
+   * The OAuth client_id to authorize with: a user-provided static client id when
+   * the instance has one (skipping DCR entirely), otherwise the client_id of a
+   * dynamically-registered client (registering or re-registering as needed).
+   */
+  private async resolveClientId(instance: Instance, metadata: OAuthMetadata): Promise<string> {
+    if (instance.staticClientId) {
+      return instance.staticClientId;
+    }
+    return (await this.ensureRegisteredClient(instance, metadata)).clientId;
   }
 
   /**
@@ -241,6 +249,9 @@ export class GatewayAuth {
 
   /** The current client_id for an instance, or throw if not registered. */
   private async clientId(instance: Instance): Promise<string> {
+    if (instance.staticClientId) {
+      return instance.staticClientId;
+    }
     const registration = await this.registrations.get(instance.id);
     if (!registration) {
       throw new vscode.LanguageModelError(`Not signed in to ${instance.label}. Run "Logfire AI Gateway: Sign In".`);
